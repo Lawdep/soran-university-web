@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Data Importer - گەیاندنی داتا</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  direction: rtl;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.upload-section {
+  border: 3px dashed #9b59b6;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  transition: all 0.3s;
+}
+
+.upload-section:hover {
+  background: #e9ecef;
+  border-color: #8e44ad;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-btn {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s;
+}
+
+.upload-btn:hover {
+  transform: translateY(-2px);
+}
+
+.import-btn {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  border: none;
+  padding: 18px 40px;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.import-btn:hover {
+  transform: translateY(-2px);
+}
+
+.import-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progress-section {
+  display: none;
+  margin-top: 30px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 30px;
+  background: #ecf0f1;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  width: 0%;
+  transition: width 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+
+.status {
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+.status-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 2px solid #bee5eb;
+}
+
+.status-success {
+  background: #d4edda;
+  color: #155724;
+  border: 2px solid #c3e6cb;
+}
+
+.status-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 2px solid #f5c6cb;
+}
+
+.file-info {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  display: none;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 700;
+  color: #856404;
+}
+
+.value {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.log {
+  max-height: 300px;
+  overflow-y: auto;
+  background: #2c3e50;
+  color: #2ecc71;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  margin-top: 20px;
+  display: none;
+}
+
+.log-entry {
+  padding: 3px 0;
+}
+
+.sheets-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sheet-item {
+  background: #e9ecef;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #dee2e6;
+  transition: all 0.2s;
+}
+
+.sheet-item:hover {
+  border-color: #9b59b6;
+  transform: translateY(-2px);
+}
+
+.sheet-name {
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.sheet-count {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔥 Firebase Data Importer</h1>
+  <p class="subtitle">گەیاندنی زانیارییەکانی Excel بۆ Firebase Firestore</p>
+
+  <div class="upload-section">
+    <p style="font-size: 18px; margin-bottom: 20px; color: #7f8c8d;">
+      📁 فایلی Excel هەڵبژێرە (new 7.xlsx)
+    </p>
+    <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+      📂 هەڵبژاردنی فایل
+    </button>
+    <p id="fileName" style="margin-top: 15px; color: #27ae60; font-weight: 700;"></p>
+  </div>
+
+  <div id="fileInfo" class="file-info">
+    <h3 style="margin-bottom: 15px; color: #856404;">زانیاری فایل:</h3>
+    <div class="info-item">
+      <span class="label">ناوی فایل:</span>
+      <span class="value" id="infoFileName">---</span>
+    </div>
+    <div class="info-item">
+      <span class="label">ژمارەی شیتەکان:</span>
+      <span class="value" id="infoSheetCount">0</span>
+    </div>
+    <div class="info-item">
+      <span class="label">کۆی ڕیزەکان:</span>
+      <span class="value" id="infoTotalRows">0</span>
+    </div>
+    
+    <div id="sheetsList" class="sheets-list"></div>
+  </div>
+
+  <button id="importBtn" class="import-btn" onclick="startImport()" disabled>
+    🚀 دەستپێکردنی گەیاندن بۆ Firebase
+  </button>
+
+  <div id="progressSection" class="progress-section">
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill">0%</div>
+    </div>
+    <div id="statusMessage" class="status status-info">
+      ئامادەکاری...
+    </div>
+  </div>
+
+  <div id="log" class="log"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// Your Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBweVmkw2u0mAJG-1hGkY90-dOpAqF3w6k",
+  authDomain: "soran-university-system.firebaseapp.com",
+  projectId: "soran-university-system",
+  storageBucket: "soran-university-system.firebasestorage.app",
+  messagingSenderId: "867140730083",
+  appId: "1:867140730083:web:4aa8f0d8d92f9224cb99d6",
+  measurementId: "G-XNH4ECHMKJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let workbookData = null;
+let sheetsData = {};
+
+// File input handler
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  document.getElementById('fileName').textContent = '✓ ' + file.name;
+  
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const data = new Uint8Array(event.target.result);
+    workbookData = XLSX.read(data, { type: 'array' });
+    
+    processWorkbook(workbookData, file.name);
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function processWorkbook(workbook, fileName) {
+  sheetsData = {};
+  let totalRows = 0;
+  
+  const sheetsList = document.getElementById('sheetsList');
+  sheetsList.innerHTML = '';
+  
+  workbook.SheetNames.forEach(sheetName => {
+    const sheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+    
+    sheetsData[sheetName] = jsonData;
+    totalRows += jsonData.length;
+    
+    // Display sheet info
+    const sheetDiv = document.createElement('div');
+    sheetDiv.className = 'sheet-item';
+    sheetDiv.innerHTML = `
+      <div class="sheet-name">${sheetName}</div>
+      <div class="sheet-count">${jsonData.length} ڕیز</div>
+    `;
+    sheetsList.appendChild(sheetDiv);
+  });
+  
+  // Update file info
+  document.getElementById('infoFileName').textContent = fileName;
+  document.getElementById('infoSheetCount').textContent = workbook.SheetNames.length;
+  document.getElementById('infoTotalRows').textContent = totalRows;
+  document.getElementById('fileInfo').style.display = 'block';
+  document.getElementById('importBtn').disabled = false;
+  
+  addLog('✓ فایل بە سەرکەوتوویی خوێندرایەوە');
+  addLog(`✓ ${workbook.SheetNames.length} شیت دۆزرایەوە`);
+  addLog(`✓ کۆی ${totalRows} ڕیز`);
+}
+
+window.startImport = async function() {
+  if (!workbookData) {
+    alert('تکایە سەرەتا فایلێک هەڵبژێرە');
+    return;
+  }
+  
+  document.getElementById('importBtn').disabled = true;
+  document.getElementById('progressSection').style.display = 'block';
+  document.getElementById('log').style.display = 'block';
+  
+  try {
+    await importAllData();
+  } catch (error) {
+    showStatus('هەڵە: ' + error.message, 'error');
+    addLog('✗ هەڵە: ' + error.message);
+  }
+};
+
+async function importAllData() {
+  const collections = [
+    { name: 'UserRoles', firestoreName: 'users', mapper: mapUserRole },
+    { name: 'PreAccepted', firestoreName: 'preAccepted', mapper: mapPreAccepted },
+    { name: 'UniqueNumbers', firestoreName: 'uniqueNumbers', mapper: mapUniqueNumber },
+    { name: 'LegalPanel', firestoreName: 'legalPanel', mapper: mapLegalPanel },
+    { name: 'AccommodationPanel', firestoreName: 'accommodationPanel', mapper: mapAccommodation },
+    { name: 'RegisteredStudents', firestoreName: 'registeredStudents', mapper: mapRegistered }
+  ];
+  
+  let totalProcessed = 0;
+  let totalRecords = 0;
+  
+  // Calculate total records
+  collections.forEach(col => {
+    if (sheetsData[col.name]) {
+      totalRecords += sheetsData[col.name].length;
+    }
+  });
+  
+  for (const collectionConfig of collections) {
+    const sheetData = sheetsData[collectionConfig.name];
+    
+    if (!sheetData || sheetData.length === 0) {
+      addLog(`⚠ ${collectionConfig.name} نەدۆزرایەوە یان بەتاڵە`);
+      continue;
+    }
+    
+    addLog(`🔄 دەستپێکردنی گەیاندنی ${collectionConfig.name}...`);
+    
+    // Import in batches of 500 (Firestore limit)
+    const batchSize = 500;
+    for (let i = 0; i < sheetData.length; i += batchSize) {
+      const batch = writeBatch(db);
+      const batchData = sheetData.slice(i, Math.min(i + batchSize, sheetData.length));
+      
+      for (const row of batchData) {
+        const mappedData = collectionConfig.mapper(row);
+        if (mappedData) {
+          const docRef = doc(collection(db, collectionConfig.firestoreName));
+          batch.set(docRef, mappedData);
+        }
+      }
+      
+      await batch.commit();
+      totalProcessed += batchData.length;
+      
+      const progress = Math.round((totalProcessed / totalRecords) * 100);
+      updateProgress(progress);
+      
+      addLog(`✓ ${batchData.length} تۆمار گەیێندرا بۆ ${collectionConfig.firestoreName}`);
+    }
+    
+    addLog(`✓ ${collectionConfig.name} تەواو بوو (${sheetData.length} تۆمار)`);
+  }
+  
+  showStatus('✓ هەموو زانیارییەکان بە سەرکەوتوویی گەیێندران!', 'success');
+  addLog('🎉 گەیاندن تەواو بوو!');
+}
+
+// Mapping functions
+function mapUserRole(row) {
+  if (!row['User Email']) return null;
+  return {
+    email: String(row['User Email'] || ''),
+    role: String(row['Role'] || ''),
+    roleNameKurdish: String(row['Role Name (Kurdish)'] || ''),
+    status: String(row['Status'] || 'Active'),
+    createdAt: row['Created Date'] ? new Date(row['Created Date']) : new Date()
+  };
+}
+
+function mapPreAccepted(row) {
+  if (!row['Student ID School']) return null;
+  return {
+    studentIdSchool: String(row['Student ID School'] || ''),
+    studentIdNational: String(row['Student ID National'] || ''),
+    nameEnglish: String(row['Name English'] || ''),
+    nameKurdish: String(row['Name Kurdish'] || ''),
+    departmentCode: String(row['Department Code'] || ''),
+    facultyName: String(row['Faculty Name'] || ''),
+    departmentName: String(row['Department Name'] || ''),
+    statusType: String(row['Status Type'] || ''),
+    timeEducation: String(row['Time Education'] || ''),
+    year: parseInt(row['Year']) || 2025,
+    stage: parseInt(row['Stage']) || 1,
+    homePlace: String(row['Home Place'] || ''),
+    gender: String(row['Gender'] || ''),
+    blood: String(row['Blood'] || ''),
+    depEduCode: parseInt(row['Dep_edu_code']) || 0,
+    amountGrade: parseInt(row['amount_grade']) || 0,
+    mobileNumber: String(row['Mobile_Number'] || ''),
+    mobileNumber2: String(row['Mobile_Number2'] || ''),
+    lastEdited: row['Last Edited'] ? new Date(row['Last Edited']) : null,
+    editorEmail: String(row['Editor Email'] || ''),
+    editNote: String(row['Edit Note'] || '')
+  };
+}
+
+function mapUniqueNumber(row) {
+  if (!row['Unique Number']) return null;
+  return {
+    uniqueNumber: String(row['Unique Number'] || ''),
+    studentIdSchool: String(row['Student ID School'] || ''),
+    studentIdNational: String(row['Student ID National'] || ''),
+    nameKurdish: String(row['Name Kurdish'] || ''),
+    nameEnglish: String(row['Name English'] || ''),
+    departmentCode: String(row['Department Code'] || ''),
+    generatedDate: String(row['Generated Date'] || ''),
+    printCount: parseInt(row['Print Count']) || 0,
+    facultyName: String(row['Faculty Name'] || row['__EMPTY'] || ''),
+    timeEducation: String(row['Time Education'] || ''),
+    year: parseInt(row['Year']) || 2025,
+    stage: parseInt(row['Stage']) || 1,
+    createdAt: new Date()
+  };
+}
+
+function mapLegalPanel(row) {
+  if (!row['Unique Number']) return null;
+  return {
+    uniqueNumber: String(row['Unique Number'] || ''),
+    studentIdSchool: String(row['Student ID School'] || ''),
+    studentIdNational: String(row['Student ID National'] || ''),
+    nameKurdish: String(row['Name Kurdish'] || ''),
+    nameEnglish: String(row['Name English'] || ''),
+    department: String(row['Department'] || ''),
+    legalStatus: String(row['Legal Status'] || ''),
+    documentTemplateId: String(row['Document Template ID'] || ''),
+    generatedDocumentId: String(row['Generated Document ID'] || ''),
+    processDate: row['Process Date'] ? new Date(row['Process Date']) : null,
+    officer: String(row['Officer'] || ''),
+    notes: String(row['Notes'] || '')
+  };
+}
+
+function mapAccommodation(row) {
+  if (!row['Student ID School']) return null;
+  return {
+    registrationId: String(row['Registration ID'] || ''),
+    studentIdSchool: String(row['Student ID School'] || ''),
+    studentIdNational: String(row['Student ID National'] || ''),
+    nameKurdish: String(row['Name Kurdish'] || ''),
+    nameEnglish: String(row['Name English'] || ''),
+    department: String(row['Department'] || ''),
+    accommodationStatus: String(row['Accommodation Status'] || ''),
+    roomNumber: parseInt(row['Room Number']) || 0,
+    building: String(row['Building'] || ''),
+    assignmentDate: row['Assignment Date'] ? new Date(row['Assignment Date']) : null,
+    monthlyFee: String(row['Monthly Fee'] || ''),
+    officer: String(row['Officer'] || ''),
+    notes: String(row['Notes'] || ''),
+    gender: String(row['Gender'] || '')
+  };
+}
+
+function mapRegistered(row) {
+  if (!row['Student ID School']) return null;
+  return {
+    registrationId: String(row['Registration ID'] || ''),
+    studentIdSchool: String(row['Student ID School'] || ''),
+    studentIdNational: String(row['Student ID National'] || ''),
+    nameEnglish: String(row['Name English'] || ''),
+    nameKurdish: String(row['Name Kurdish'] || ''),
+    departmentCode: String(row['Department Code'] || ''),
+    facultyName: String(row['Faculty Name'] || ''),
+    departmentName: String(row['Department Name'] || ''),
+    timeEducation: String(row['Time Education'] || ''),
+    year: parseInt(row['Year']) || 2025,
+    stage: parseInt(row['Stage']) || 1,
+    gender: String(row['Gender'] || ''),
+    bloodGroup: String(row['Blood Group'] || ''),
+    mobileNumber: String(row['Mobile Number'] || ''),
+    registrationDate: row['Registration Date'] ? new Date(row['Registration Date']) : new Date(),
+    legalStatus: String(row['Legal Status'] || ''),
+    financeStatus: String(row['Finance Status'] || ''),
+    accommodationStatus: String(row['Accommodation Status'] || ''),
+    decision: String(row['Decision'] || ''),
+    createEmail: String(row['Create_email'] || '')
+  };
+}
+
+function updateProgress(percent) {
+  const fill = document.getElementById('progressFill');
+  fill.style.width = percent + '%';
+  fill.textContent = percent + '%';
+}
+
+function showStatus(message, type) {
+  const status = document.getElementById('statusMessage');
+  status.className = 'status status-' + type;
+  status.textContent = message;
+}
+
+function addLog(message) {
+  const log = document.getElementById('log');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const timestamp = new Date().toLocaleTimeString('ku-IQ');
+  entry.textContent = `[${timestamp}] ${message}`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+</script>
+
+</body>
+</html>
