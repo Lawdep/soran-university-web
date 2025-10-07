@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیستەمی زانکۆی سۆران - Soran University System</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --primary: #9b59b6;
+  --primary-hover: #8e44ad;
+  --success: #27ae60;
+  --error: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Kurdish Web', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  direction: rtl;
+}
+
+/* Login Screen */
+.login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 48px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.login-card h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.login-card p {
+  color: var(--muted);
+  font-size: 18px;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Header */
+.header {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-small {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.header-title h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.header-title p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  text-align: left;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.user-role {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.logout-btn {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+  font-size: 2.5em;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 0.95em;
+  opacity: 0.95;
+}
+
+/* Panels */
+.panels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.panel-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.panel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.panel-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+}
+
+.panel-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.panel-description {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Unique Panel */
+.unique-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.search-section {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 2px solid var(--primary);
+  padding: 28px;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.search-box {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.search-box input {
+  padding: 16px 24px;
+  border: 3px solid var(--primary);
+  border-radius: 12px;
+  font-size: 18px;
+  width: 350px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-print {
+  background: linear-gradient(135deg, var(--success), #2ecc71);
+  font-size: 18px;
+  padding: 20px 48px;
+}
+
+.alert {
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.alert-success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 2px solid #16a34a;
+}
+
+.alert-error {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border: 2px solid #ef4444;
+}
+
+.alert-info {
+  background: #e0f2fe;
+  color: #075985;
+  border: 2px solid #0ea5e9;
+}
+
+.unique-result {
+  background: white;
+  border: 3px solid var(--success);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 30px 0;
+  text-align: center;
+  display: none;
+}
+
+.unique-number {
+  font-size: 3.5em;
+  font-weight: 900;
+  color: var(--success);
+  margin: 24px 0;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+  padding: 20px;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  border-radius: 12px;
+}
+
+.student-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.info-item {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.info-value {
+  color: var(--text);
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  color: var(--muted);
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+  }
+  .search-box {
+    flex-direction: column;
+  }
+  .search-box input {
+    width: 100%;
+  }
+  .panels-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <img src="https://i.imgur.com/qlBzfCs.png" alt="Soran University" style="max-width: 140px; margin: 0 auto 24px; display: block;">
+    <h2>بەخێربێن بۆ زانکۆی سۆران</h2>
+    <p>سیستەمی ناوەندی بۆ بەڕێوەبردنی کاروباری زانکۆ</p>
+    <div id="loginError"></div>
+    <button class="login-btn" id="loginBtn" onclick="loginWithGoogle()">
+      <i class="fab fa-google"></i>
+      چوونە ژوورەوە بە Google
+    </button>
+    <p style="font-size: 14px; color: var(--muted); margin-top: 24px;">
+      تکایە بە ئیمەیڵی زانکۆیی خۆت بچۆ ژوورەوە
+    </p>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="mainApp" class="hidden">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <img src="https://i.imgur.com/qlBzfCs.png" alt="Logo" class="logo-small">
+        <div class="header-title">
+          <h1>زانکۆی سۆران</h1>
+          <p>سیستەمی بەڕێوەبردن</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <div class="user-name" id="userName"></div>
+          <div class="user-role" id="userRole"></div>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          دەرچوون
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <!-- Dashboard View -->
+    <div id="dashboardView">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-number" id="totalStudents">0</div>
+          <div class="stat-label">قوتابیانی نوێ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="uniqueGenerated">0</div>
+          <div class="stat-label">ژمارە دروستکراوەکان</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="registeredCount">0</div>
+          <div class="stat-label">تۆمارکراوەکان</div>
+        </div>
+      </div>
+
+      <!-- Panels Grid -->
+      <div class="panels-grid" id="panelsGrid"></div>
+    </div>
+
+    <!-- Unique Panel View -->
+    <div id="uniquePanelView" class="hidden">
+      <div class="unique-panel">
+        <button class="btn" onclick="showDashboard()" style="margin-bottom: 20px;">
+          <i class="fas fa-arrow-right"></i> گەڕانەوە
+        </button>
+        
+        <div style="background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; padding: 32px; border-radius: 16px; text-align: center; margin-bottom: 24px;">
+          <h1 style="font-size: 28px; margin-bottom: 8px;">🎯 دروستکردنی ژمارەی تایبەت</h1>
+          <p>سیستەمی دروستکردن و بەڕێوەبردنی ژمارە یەکتاکان</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="uniqueTotalGenerated">0</div>
+            <div class="stat-label">کۆی ژمارە دروستکراوەکان</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="uniqueTodayGenerated">0</div>
+            <div class="stat-label">ئەمڕۆ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="uniqueLastNumber">---</div>
+            <div class="stat-label">کۆتا ژمارە</div>
+          </div>
+        </div>
+
+        <div class="search-section">
+          <h3>ژمارەی قوتابی (زانکۆ) داخڵ بکە</h3>
+          <div class="search-box">
+            <input type="text" id="studentIdSchool" placeholder="19222525" maxlength="20">
+            <button class="btn" onclick="searchStudent()">🔍 گەڕان و دروستکردن</button>
+          </div>
+          <p style="color: var(--muted); font-size: 14px;">نموونە: 19222525, 19923</p>
+        </div>
+
+        <div id="searchAlert"></div>
+
+        <div id="uniqueResult" class="unique-result">
+          <h2 style="color: var(--success); margin-bottom: 20px;">✅ ژمارەی تایبەت دروستکرا</h2>
+          <div class="unique-number" id="displayUniqueNumber">UN001</div>
+          <div style="font-size: 2em; font-weight: 700; margin: 20px 0;" id="displayKurdishName">ناوی قوتابی</div>
+          
+          <div class="student-info">
+            <div class="info-item">
+              <div class="info-label">ژمارەی قوتابی</div>
+              <div class="info-value" id="displayStudentId">---</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">ناوی ئینگلیزی</div>
+              <div class="info-value" id="displayEnglishName">---</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">کۆلێژ</div>
+              <div class="info-value" id="displayFaculty">---</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">بەش</div>
+              <div class="info-value" id="displayDepartment">---</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button class="btn btn-print" onclick="printUniqueNumber()">🖨️ چاپکردن</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, collection, getDocs, query, where, doc, getDoc, setDoc, addDoc, updateDoc, serverTimestamp, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// Firebase Configuration - Soran University System
+const firebaseConfig = {
+  apiKey: "AIzaSyBweVmkw2u0mAJG-1hGkY90-dOpAqF3w6k",
+  authDomain: "soran-university-system.firebaseapp.com",
+  projectId: "soran-university-system",
+  storageBucket: "soran-university-system.firebasestorage.app",
+  messagingSenderId: "867140730083",
+  appId: "1:867140730083:web:4aa8f0d8d92f9224cb99d6",
+  measurementId: "G-XNH4ECHMKJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// USER ROLES
+const USER_ROLES = {
+  'UNIQUE_OPERATOR': {
+    name: 'ئۆپەرەیتەری ژمارەی تایبەت',
+    allowedPanels: ['unique'],
+    color: '#9b59b6',
+    icon: 'fa-hashtag'
+  },
+  'QUEUE_MANAGER': {
+    name: 'بەڕێوەبەری ڕیز',
+    allowedPanels: ['queue'],
+    color: '#3498db',
+    icon: 'fa-users-line'
+  },
+  'REGISTRATION_OFFICER': {
+    name: 'بەکاربەری تۆمارکردن',
+    allowedPanels: ['registration'],
+    color: '#27ae60',
+    icon: 'fa-user-plus'
+  },
+  'LEGAL_OFFICER': {
+    name: 'بەکاربەری یاسایی',
+    allowedPanels: ['legal'],
+    color: '#e74c3c',
+    icon: 'fa-gavel'
+  },
+  'FINANCE_OFFICER': {
+    name: 'بەکاربەری دارایی',
+    allowedPanels: ['finance'],
+    color: '#f39c12',
+    icon: 'fa-money-bill-wave'
+  },
+  'ACCOMMODATION_OFFICER': {
+    name: 'بەکاربەری نیشتەجێبوون',
+    allowedPanels: ['accommodation'],
+    color: '#16a085',
+    icon: 'fa-building'
+  },
+  'PREACCEPTED_OFFICER': {
+    name: 'ئەفسەری پێش-پەسەندکردن',
+    allowedPanels: ['preaccepted'],
+    color: '#8e44ad',
+    icon: 'fa-user-check'
+  },
+  'SYSTEM_ADMIN': {
+    name: 'بەڕێوەبەری سیستەم',
+    allowedPanels: ['unique', 'queue', 'registration', 'legal', 'finance', 'accommodation', 'preaccepted'],
+    color: '#2c3e50',
+    icon: 'fa-user-shield'
+  }
+};
+
+const PANELS = {
+  'unique': { name: 'ژمارەی تایبەت', icon: 'fa-hashtag', description: 'دروستکردن و چاپکردنی ژمارەی تایبەت' },
+  'queue': { name: 'بەڕێوەبردنی ڕیز', icon: 'fa-users-line', description: 'بەڕێوەبردنی ڕیزی چاوەڕوانی' },
+  'registration': { name: 'تۆمارکردن', icon: 'fa-user-plus', description: 'تەواوکردنی پرۆسەی تۆمارکردن' },
+  'legal': { name: 'بەشی یاسایی', icon: 'fa-gavel', description: 'بەڕێوەبردنی بەڵگەنامە یاسایییەکان' },
+  'finance': { name: 'بەشی دارایی', icon: 'fa-money-bill-wave', description: 'بەڕێوەبردنی پارەدان' },
+  'accommodation': { name: 'نیشتەجێبوون', icon: 'fa-building', description: 'دیاریکردنی ژووری نیشتەجێبوون' },
+  'preaccepted': { name: 'پێش-پەسەندکراوان', icon: 'fa-user-check', description: 'بەڕێوەبردنی قوتابیانی پێش-پەسەندکراو' }
+};
+
+let currentUser = null;
+let currentPanel = null;
+
+// Login
+window.loginWithGoogle = async function() {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> چاوەڕوان بە...';
+  
+  try {
+    const result = await signInWithPopup(auth, provider);
+    await loadUserData(result.user);
+  } catch (error) {
+    console.error('Login error:', error);
+    showError('هەڵە لە چوونە ژوورەوە: ' + error.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fab fa-google"></i> چوونە ژوورەوە بە Google';
+  }
+};
+
+// Logout
+window.logout = async function() {
+  try {
+    await signOut(auth);
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    currentUser = null;
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+};
+
+// Load user data
+async function loadUserData(user) {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    let userRole = 'STUDENT';
+    
+    if (userDoc.exists()) {
+      userRole = userDoc.data().role || 'STUDENT';
+    } else {
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        name: user.displayName,
+        role: 'STUDENT',
+        createdAt: serverTimestamp()
+      });
+    }
+    
+    currentUser = {
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName,
+      role: userRole,
+      ...USER_ROLES[userRole]
+    };
+    
+    showDashboard();
+  } catch (error) {
+    console.error('Error loading user:', error);
+    showError('هەڵە لە بارکردنی زانیاری بەکارهێنەر');
+  }
+}
+
+// Show dashboard
+function showDashboard() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('uniquePanelView').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('dashboardView').classList.remove('hidden');
+  
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userRole').textContent = currentUser.name;
+  
+  renderPanels();
+  loadStatistics();
+}
+
+window.showDashboard = showDashboard;
+
+// Render panels
+function renderPanels() {
+  const container = document.getElementById('panelsGrid');
+  container.innerHTML = '';
+  
+  const allowedPanels = currentUser.allowedPanels || [];
+  
+  allowedPanels.forEach(panelKey => {
+    const panel = PANELS[panelKey];
+    if (!panel) return;
+    
+    const div = document.createElement('div');
+    div.className = 'panel-card';
+    div.innerHTML = `
+      <div class="panel-icon" style="background: linear-gradient(135deg, ${currentUser.color}, ${currentUser.color}dd);">
+        <i class="fas ${panel.icon}"></i>
+      </div>
+      <div class="panel-title">${panel.name}</div>
+      <div class="panel-description">${panel.description}</div>
+    `;
+    div.onclick = () => openPanel(panelKey);
+    container.appendChild(div);
+  });
+}
+
+// Open panel
+function openPanel(panelKey) {
+  currentPanel = panelKey;
+  
+  if (panelKey === 'unique') {
+    document.getElementById('dashboardView').classList.add('hidden');
+    document.getElementById('uniquePanelView').classList.remove('hidden');
+    loadUniqueStats();
+  } else {
+    alert(`پانێڵی ${PANELS[panelKey].name} لە ژێر دروستکردندایە`);
+  }
+}
+
+// Load statistics
+async function loadStatistics() {
+  try {
+    const preAcceptedSnapshot = await getDocs(collection(db, 'preAccepted'));
+    document.getElementById('totalStudents').textContent = preAcceptedSnapshot.size;
+    
+    const uniqueSnapshot = await getDocs(collection(db, 'uniqueNumbers'));
+    document.getElementById('uniqueGenerated').textContent = uniqueSnapshot.size;
+    
+    const registeredSnapshot = await getDocs(collection(db, 'registeredStudents'));
+    document.getElementById('registeredCount').textContent = registeredSnapshot.size;
+  } catch (error) {
+    console.error('Error loading statistics:', error);
+  }
+}
+
+// Load unique stats
+async function loadUniqueStats() {
+  try {
+    const uniqueSnapshot = await getDocs(collection(db, 'uniqueNumbers'));
+    const total = uniqueSnapshot.size;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let todayCount = 0;
+    let lastNumber = '---';
+    
+    uniqueSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.createdAt && data.createdAt.toDate() >= today) {
+        todayCount++;
+      }
+      if (data.uniqueNumber) {
+        lastNumber = data.uniqueNumber;
+      }
+    });
+    
+    document.getElementById('uniqueTotalGenerated').textContent = total;
+    document.getElementById('uniqueTodayGenerated').textContent = todayCount;
+    document.getElementById('uniqueLastNumber').textContent = lastNumber;
+  } catch (error) {
+    console.error('Error loading unique stats:', error);
+  }
+}
+
+// Search student
+window.searchStudent = async function() {
+  const studentIdInput = document.getElementById('studentIdSchool');
+  const studentIdSchool = studentIdInput.value.trim();
+  
+  if (!studentIdSchool) {
+    showAlert('searchAlert', 'تکایە ژمارەی قوتابی داخڵ بکە', 'error');
+    return;
+  }
+  
+  if (studentIdSchool.length < 4) {
+    showAlert('searchAlert', 'ژمارەی قوتابی زۆر کورتە', 'error');
+    return;
+  }
+  
+  showAlert('searchAlert', 'گەڕان...', 'info');
+  
+  try {
+    // Check if unique number already exists
+    const uniqueQuery = query(
+      collection(db, 'uniqueNumbers'),
+      where('studentIdSchool', '==', studentIdSchool)
+    );
+    const uniqueSnapshot = await getDocs(uniqueQuery);
+    
+    if (!uniqueSnapshot.empty) {
+      const existingData = uniqueSnapshot.docs[0].data();
+      displayUniqueResult(existingData, true);
+      showAlert('searchAlert', 'قوتابی دۆزرایەوە - ژمارەی پێشتر دروستکراو', 'info');
+      return;
+    }
+    
+    // Search in preAccepted
+    const preAcceptedQuery = query(
+      collection(db, 'preAccepted'),
+      where('studentIdSchool', '==', studentIdSchool)
+    );
+    const preAcceptedSnapshot = await getDocs(preAcceptedQuery);
+    
+    if (preAcceptedSnapshot.empty) {
+      showAlert('searchAlert', 'ئەم قوتابییە لە لیستی پەسەندکراوان نییە', 'error');
+      return;
+    }
+    
+    const studentData = preAcceptedSnapshot.docs[0].data();
+    
+    // Generate unique number
+    const uniqueNumber = await generateUniqueNumber(studentData);
+    
+    displayUniqueResult({ ...studentData, uniqueNumber }, false);
+    showAlert('searchAlert', 'ژمارەی تایبەت دروستکرا', 'success');
+    loadUniqueStats();
+    
+  } catch (error) {
+    console.error('Search error:', error);
+    showAlert('searchAlert', 'هەڵە: ' + error.message, 'error');
+  }
+};
+
+// Generate unique number
+async function generateUniqueNumber(studentData) {
+  try {
+    const uniqueQuery = query(
+      collection(db, 'uniqueNumbers'),
+      orderBy('uniqueNumber', 'desc'),
+      limit(1)
+    );
+    const snapshot = await getDocs(uniqueQuery);
+    
+    let maxNumber = 0;
+    if (!snapshot.empty) {
+      const lastUnique = snapshot.docs[0].data().uniqueNumber;
+      const numPart = parseInt(lastUnique.substring(2));
+      if (!isNaN(numPart)) {
+        maxNumber = numPart;
+      }
+    }
+    
+    const nextNumber = maxNumber + 1;
+    const uniqueNumber = 'UN' + String(nextNumber).padStart(3, '0');
+    
+    await addDoc(collection(db, 'uniqueNumbers'), {
+      uniqueNumber,
+      studentIdSchool: studentData.studentIdSchool,
+      studentIdNational: studentData.studentIdNational,
+      nameKurdish: studentData.nameKurdish,
+      nameEnglish: studentData.nameEnglish,
+      departmentCode: studentData.departmentCode,
+      facultyName: studentData.facultyName,
+      departmentName: studentData.departmentName,
+      timeEducation: studentData.timeEducation,
+      year: studentData.year,
+      stage: studentData.stage,
+      createdAt: serverTimestamp(),
+      createdBy: currentUser.email,
+      printCount: 0
+    });
+    
+    return uniqueNumber;
+    
+  } catch (error) {
+    console.error('Error generating unique number:', error);
+    throw error;
+  }
+}
+
+// Display unique result
+function displayUniqueResult(data, isExisting) {
+  document.getElementById('displayUniqueNumber').textContent = data.uniqueNumber;
+  document.getElementById('displayKurdishName').textContent = data.nameKurdish || 'نامەعلوم';
+  document.getElementById('displayStudentId').textContent = data.studentIdSchool || '---';
+  document.getElementById('displayEnglishName').textContent = data.nameEnglish || '---';
+  document.getElementById('displayFaculty').textContent = data.facultyName || '---';
+  document.getElementById('displayDepartment').textContent = data.departmentName || '---';
+  
+  document.getElementById('uniqueResult').style.display = 'block';
+  document.getElementById('uniqueResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Print unique number
+window.printUniqueNumber = function() {
+  window.print();
+};
+
+// Show alert
+function showAlert(containerId, message, type) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const alertClass = type === 'success' ? 'alert-success' : 
+                     type === 'error' ? 'alert-error' : 'alert-info';
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
+  
+  container.innerHTML = `<div class="alert ${alertClass}">${icon} ${message}</div>`;
+  
+  if (type !== 'error') {
+    setTimeout(() => container.innerHTML = '', 5000);
+  }
+}
+
+// Show error
+function showError(message) {
+  const errorDiv = document.getElementById('loginError');
+  errorDiv.innerHTML = `<div class="alert alert-error">✗ ${message}</div>`;
+}
+
+// Check auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadUserData(user);
+  }
+});
+</script>
+
+</body>
+</html>
